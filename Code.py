@@ -1,6 +1,7 @@
 from tkinter import *
 import numpy as np
 from math import *
+import random
 #1: Passage d'une carte net à une carte de pression
 
 #Travail sur tkinter
@@ -205,12 +206,85 @@ def evolution_vitesse_y(acceleration_y,vitesse_y_t,t_total,k,n,m):
 
 matrice_vitesse_x_apres=evolution_vitesse_x(acc_x,matrice_vitesse_x_avant,32000,50,10,5)
 matrice_vitesse_y_apres=evolution_vitesse_y(acc_y,matrice_vitesse_y_avant,32000,50,10,5)
+
+
+
+
 #5 Travail sur les pôles
+
+t_total=1000000
+k=10000
+
+
+def intervalle_temps(t_total,k):
+    return t_total/k
+
+
+
+def deplacement_aléatoire(i_sortie,j_sortie,carte_pression):
+    """Entrée: les indices de la case de sortie de la quantité de matière
+       Sortie: la distance entre le point d'entréeet le bord de la carte et les indices de la case d'entrée"""
+    distance=random.randint(0,largeur_carte)
+    hauteur_case,largeur_case=taille_case(carte_pression)
+    distance_totale=largeur_case * i_sortie + distance    #distance par rapport au bord
+    if distance_totale>largeur_carte:
+        distance_totale=distance_totale - largeur_carte
+        i_entrée=distance_totale//largeur_case
+    else:
+       i_entrée=distance_totale//largeur_case
+    if distance_totale<i_sortie*largeur_case:
+        distance= -distance       #On prend en compte le fait que la molecule peut se deplacer vers la gauche
+    return distance, i_entrée, j_sortie
+
+
+def temps_aléatoire(v_init_x,distance):
+    """Entrée: la distance entre le point de sortie est d'entrée et la vitesse de sortie selon x
+       Sortie: le temps aléatoire pour lequel la particule ressort du pôle"""
+    temps_min=abs(distance)/abs(v_init_x)
+    temps_min += random.randint(0,int(temps_min))   #On met un int car ne marche pas avec un float
+    return temps_min
+
+i=4
+j=2
+dist,i_entrée_elementaire, j_sortie_elementaire=deplacement_aléatoire(i,j,matrice_type)
+t_sortie_elementaire=temps_aléatoire(matrice_vitesse_x_apres[i][j],dist)
+
+#dist=6069401, i_entrée_elementaire=4.0, j_sortie_elementaire=2
+#t_sortie_elementaire=1091319609267.9999
+
+
+def arrondie_temps(t,dt):
+    """Entrée: un temps, dt
+       Sortie: le nombre de dt nécessaire pour atteindre t"""
+    return int(dt*(t//dt))
+
+
+t_sortie_elementaire_final=arrondie_temps(t_sortie_elementaire,t_total/k)
+
+#1091319609200
+
+
+def passage_position_élémentaire(v_init,t_initial,i_sortie,j_sortie,n,liste,carte_pression):
+    """Entrée: le temps où l'on fait ce passage, les indices de sortie du bloc de particule, la quantité de particule élémentaire, la liste à l'instant t des éléments dans les pôles qui doivent être renvoyé. Cette liste est trié selon les temps
+    Sortie: la liste à l'instant t + dt triée"""
+    taille_liste=len(liste)
+    distance,i_entrée,j_entrée=deplacement_aléatoire(i_sortie,j_sortie,carte_pression)
+    element=[i_entrée, j_entrée, arrondie_temps(temps_aléatoire(v_init,distance), t_total/k), n]    #Information sur l'element de matière considéré
+    e=0
+    for i in range(taille_liste):
+        if element[2]>liste[i][2]:
+            e+=1           #indice d'injection des informations sur la quantité elementaire
+        else:
+            break
+    liste.insert(e,element)
+    return liste
+
+
+pas_elementaire=passage_position_élémentaire(2,100,2,4,10,[[1,2,10,30]],matrice_type)
+# [[1, 2, 10, 30], [2.0, 4, 951000, 10]]
 
 #6 passage d'une carte des vitesses à l'instant t, d'une carte des quantités de matières à l'instant t et de la taille des cellules à une carte des vitesses à t + dt et une carte des quantités de matières à t + dt (def update_matière)
 
 #7 Création de la fonction totale : temps de la mesure finale, table initial, carte accélération -> Table final
 
 #8 def extraction : table final -> Image avec les quantités de matières
-
-
