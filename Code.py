@@ -60,7 +60,7 @@ altitude=9000   #La température ne varie pas entre 9 et 20 km (à peu près)
 def passage_temperature_sol_pression(M,Tsol):  #M en kg/mol, Tsol la température au sol
     return P0*((Tsol-constante*altitude)/Tsol)**(M*9.81/(constante*8.31)) #Demo dans l'open office
 
-# Travail passage carte de pression à carte d'accélération
+#2 Travail passage carte de pression à carte d'accélération
 
 #On travail avec des matrices n*m
 
@@ -70,19 +70,26 @@ matrice_type=np.arange(1,n*m+1)
 matrice_type=matrice_type.reshape(n,m)  #Matrice type pour faire des exemples simples
 
 
+
 Rt=6371000
 theta=23.0+26/60*100      #angle equateur/tropique (23°26')
 def distance_equateur_tropique():
     """donne la distance equateur//tropique"""
     return sqrt(2*(Rt**2)*(1+cos(theta)))
 
+
+
 hauteur_carte=12560000
 largeur_carte=40075000
+
+
 
 def taille_case(carte_pression):
     """Prend la carte de pression et renvoie la taille réel des cases en m (hauteur de la case, largeur de la case)"""
     n,m=len(carte_pression),len(carte_pression[0])
     return hauteur_carte/n,largeur_carte/m
+
+
 
 def passage_carte_pression_carte_acceleration_selon_x(masse_volumique,carte_pression):
     """Donne une matrice dont les coordonnées sont les accélérations selon x en ce point de la matrice"""
@@ -104,6 +111,10 @@ def passage_carte_pression_carte_acceleration_selon_x(masse_volumique,carte_pres
         matrice_final.append(liste)
     return matrice_final
 
+
+
+
+
 def passage_carte_pression_carte_acceleration_selon_y(masse_volumique,carte_pression):
     n,m=len(carte_pression),len(carte_pression[0])   #Matrice Mn,m(R)
     matrice_1_y=[]
@@ -121,8 +132,33 @@ def passage_carte_pression_carte_acceleration_selon_y(masse_volumique,carte_pres
             liste.append((matrice_1_y[i][j] + matrice_1_y[i+1][j])/2)
         liste.append(matrice_1_y[n-2][j])
         matrice_final.append(liste)
-    return matrice_final   #il faut faire la transposée!!!
+    return matrice_final
 
 
-#2: Passage d'une carte de pression à une carte d'accélération
-#3: Passage d'une situation initiale (quantité de matière initiale, sa position, la vitesse initiale en tout point) à une table de l'instant initiale (carte vitesse à t0 ET carte des quantités de matières à t0)
+
+
+
+#3: Passage d'une situation initiale (quantité de matière initiale, sa position, la vitesse initiale en tout point) à une table de l'instant initiale (carte vitesse à t0 ET carte des quantités de matières à t0) (def init)
+
+
+def init(position,n,m):
+    """Entrée: une liste position dont les éléments sont du type [i,j,quantité de matière, vitesse] avec i et j les indices des positions (dans le cas de cases vides, pas besoin de le préciser dans la liste position), n et m les dimensions de la matrice finale et renvoie une matrice avec les quantités de matières initiallement et une matrice avec les vitesses initiales"""
+    matrice_mat_init=np.zeros(n*m)
+    matrice_mat_init=matrice_mat_init.reshape(n,m)
+    matrice_vit_init=np.zeros(n*m)
+    matrice_vit_init=matrice_vit_init.reshape(n,m)
+    for k in range(len(position)):
+        matrice_mat_init[position[k][0] - 1][position[k][1] - 1]=position[k][2]  # -1 s'explique par la différence d'indicage entre une matrice classique et une matrice python
+        matrice_vit_init[position[k][0] - 1][position[k][1] - 1]=position[k][3]
+    return matrice_mat_init,matrice_vit_init
+
+#4 Passage d'une carte des vitesses à l'instant t et de la carte des accélérations à la carte des vitesses à l'instant t + dt (def update_vitesse)
+
+#5 Travail sur les pôles
+
+#6 passage d'une carte des vitesses à l'instant t, d'une carte des quantités de matières à l'instant t et de la taille des cellules à une carte des vitesses à t + dt et une carte des quantités de matières à t + dt (def update_matière)
+
+#7 Création de la fonction totale : temps de la mesure finale, table initial, carte accélération -> Table final
+
+#8 def extraction : table final -> Image avec les quantités de matières
+
