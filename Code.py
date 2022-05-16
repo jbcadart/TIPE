@@ -142,15 +142,18 @@ def passage_carte_pression_carte_acceleration_selon_y(masse_volumique,carte_pres
 
 
 def init(position,n,m):
-    """Entrée: une liste position dont les éléments sont du type [i,j,quantité de matière, vitesse] avec i et j les indices des positions (dans le cas de cases vides, pas besoin de le préciser dans la liste position), n et m les dimensions de la matrice finale et renvoie une matrice avec les quantités de matières initiallement et une matrice avec les vitesses initiales"""
+    """Entrée: une liste position dont les éléments sont du type [i,j,quantité de matière, vitesses selon x, vitesses selon y] avec i et j les indices des positions (dans le cas de cases vides, pas besoin de le préciser dans la liste position), n et m les dimensions de la matrice finale et renvoie une matrice avec les quantités de matières initiallement, une matrice avec les vitesses initiales selon x et les vitesses initiales selon y"""
     matrice_mat_init=np.zeros(n*m)
     matrice_mat_init=matrice_mat_init.reshape(n,m)
-    matrice_vit_init=np.zeros(n*m)
-    matrice_vit_init=matrice_vit_init.reshape(n,m)
+    matrice_vit_x_init=np.zeros(n*m)
+    matrice_vit_x_init=matrice_vit_x_init.reshape(n,m)
+    matrice_vit_y_init=np.zeros(n*m)
+    matrice_vit_y_init=matrice_vit_y_init.reshape(n,m)
     for k in range(len(position)):
         matrice_mat_init[position[k][0] - 1][position[k][1] - 1]=position[k][2]  # -1 s'explique par la différence d'indicage entre une matrice classique et une matrice python
-        matrice_vit_init[position[k][0] - 1][position[k][1] - 1]=position[k][3]
-    return matrice_mat_init,matrice_vit_init
+        matrice_vit_x_init[position[k][0] - 1][position[k][1] - 1]=position[k][3]
+        matrice_vit_y_init[position[k][0] - 1][position[k][1] - 1]=position[k][4]
+    return matrice_mat_init,matrice_vit_x_init,matrice_vit_y_init
 
 #4 Passage d'une carte des vitesses à l'instant t et de la carte des accélérations à la carte des vitesses à l'instant t + dt (def update_vitesse)
 
