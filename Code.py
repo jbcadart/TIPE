@@ -113,6 +113,7 @@ def passage_carte_pression_carte_acceleration_selon_x(masse_volumique,carte_pres
 
 
 
+acc_x=passage_carte_pression_carte_acceleration_selon_x(32,matrice_type)
 
 
 def passage_carte_pression_carte_acceleration_selon_y(masse_volumique,carte_pression):
@@ -135,28 +136,75 @@ def passage_carte_pression_carte_acceleration_selon_y(masse_volumique,carte_pres
     return matrice_final
 
 
-
+acc_y=passage_carte_pression_carte_acceleration_selon_x(32,matrice_type)
 
 
 #3: Passage d'une situation initiale (quantité de matière initiale, sa position, la vitesse initiale en tout point) à une table de l'instant initiale (carte vitesse à t0 ET carte des quantités de matières à t0) (def init)
 
 
-def init(position,n,m):
+
+
+def init_vitesse_x(position,n,m):
     """Entrée: une liste position dont les éléments sont du type [i,j,quantité de matière, vitesses selon x, vitesses selon y] avec i et j les indices des positions (dans le cas de cases vides, pas besoin de le préciser dans la liste position), n et m les dimensions de la matrice finale et renvoie une matrice avec les quantités de matières initiallement, une matrice avec les vitesses initiales selon x et les vitesses initiales selon y"""
-    matrice_mat_init=np.zeros(n*m)
-    matrice_mat_init=matrice_mat_init.reshape(n,m)
     matrice_vit_x_init=np.zeros(n*m)
     matrice_vit_x_init=matrice_vit_x_init.reshape(n,m)
+    for k in range(len(position)):
+        matrice_vit_x_init[position[k][0] - 1][position[k][1] - 1]=position[k][3] # -1 s'explique par la différence d'indicage entre une matrice classique et une matrice python
+    return matrice_vit_x_init
+
+
+
+def init_vitesse_y(position,n,m):
+    """Entrée: une liste position dont les éléments sont du type [i,j,quantité de matière, vitesses selon x, vitesses selon y] avec i et j les indices des positions (dans le cas de cases vides, pas besoin de le préciser dans la liste position), n et m les dimensions de la matrice finale et renvoie une matrice avec les quantités de matières initiallement, une matrice avec les vitesses initiales selon x et les vitesses initiales selon y"""
     matrice_vit_y_init=np.zeros(n*m)
     matrice_vit_y_init=matrice_vit_y_init.reshape(n,m)
     for k in range(len(position)):
-        matrice_mat_init[position[k][0] - 1][position[k][1] - 1]=position[k][2]  # -1 s'explique par la différence d'indicage entre une matrice classique et une matrice python
-        matrice_vit_x_init[position[k][0] - 1][position[k][1] - 1]=position[k][3]
         matrice_vit_y_init[position[k][0] - 1][position[k][1] - 1]=position[k][4]
-    return matrice_mat_init,matrice_vit_x_init,matrice_vit_y_init
+    return matrice_vit_y_init
 
-#4 Passage d'une carte des vitesses à l'instant t et de la carte des accélérations à la carte des vitesses à l'instant t + dt (def update_vitesse)
 
+
+def init_matiere(position,n,m):
+    """Entrée: une liste position dont les éléments sont du type [i,j,quantité de matière, vitesses selon x, vitesses selon y] avec i et j les indices des positions (dans le cas de cases vides, pas besoin de le préciser dans la liste position), n et m les dimensions de la matrice finale et renvoie une matrice avec les quantités de matières initiallement, une matrice avec les vitesses initiales selon x et les vitesses initiales selon y"""
+    matrice_mat_init=np.zeros(n*m)
+    matrice_mat_init=matrice_mat_init.reshape(n,m)
+    for k in range(len(position)):
+        matrice_mat_init[position[k][0] - 1][position[k][1] - 1]=position[k][2]  # -1 s'explique par la différence d'indicage entre une matrice classique et une matrice python
+    return matrice_mat_init
+
+
+matrice_vitesse_x_avant=init_vitesse_x([[2,1,2.244,9876,123]],10,5)
+matrice_vitesse_y_avant=init_vitesse_y([[2,1,2.244,9876,123]],10,5)
+matrice_matiere_avant=init_matiere([[2,1,2.244,9876,123]],10,5)
+
+#4 Passage d'une carte des vitesses à l'instant t, le temps total du traitement, le nombre de sous intevalles de temps et de la carte des accélérations à la carte des vitesses à l'instant t + dt (def update_vitesse)
+
+
+def evolution_vitesse_x(acceleration_x,vitesse_x_t,t_total,k,n,m):
+    dt=t_total/k
+    vitesse_x_dt=np.zeros(n*m)
+    vitesse_x_dt=vitesse_x_dt.reshape(n,m)
+    for i in range(n):
+        for j in range(m):
+            vitesse_x_dt[i][j]=vitesse_x_t[i][j] + acceleration_x[i][j]*dt
+    return vitesse_x_dt
+
+
+
+def evolution_vitesse_y(acceleration_y,vitesse_y_t,t_total,k,n,m):
+    dt=t_total/k
+    vitesse_y_dt=np.zeros(n*m)
+    vitesse_y_dt=vitesse_y_dt.reshape(n,m)
+    for i in range(n):
+        for j in range(m):
+            vitesse_y_dt[i][j]=vitesse_y_t[i][j] + acceleration_y[i][j]*dt
+    return vitesse_y_dt
+
+
+
+
+matrice_vitesse_x_apres=evolution_vitesse_x(acc_x,matrice_vitesse_x_avant,32000,50,10,5)
+matrice_vitesse_y_apres=evolution_vitesse_y(acc_y,matrice_vitesse_y_avant,32000,50,10,5)
 #5 Travail sur les pôles
 
 #6 passage d'une carte des vitesses à l'instant t, d'une carte des quantités de matières à l'instant t et de la taille des cellules à une carte des vitesses à t + dt et une carte des quantités de matières à t + dt (def update_matière)
@@ -164,4 +212,5 @@ def init(position,n,m):
 #7 Création de la fonction totale : temps de la mesure finale, table initial, carte accélération -> Table final
 
 #8 def extraction : table final -> Image avec les quantités de matières
+
 
