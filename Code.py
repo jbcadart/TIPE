@@ -54,12 +54,71 @@ import random
 
 # Travail sur le passage de carte de température au sol à carte de pression
 
+
+
+
+
 constante=3.9*10**-3  #Constante  calculé dans la démo de la fonction passage_temperature_sol_pression(M,Tsol) dans l'open office
 P0=100000
 altitude=9000   #La température ne varie pas entre 9 et 20 km (à peu près)
+g=9.81
+R=8.31
 
-def passage_temperature_sol_pression(M,Tsol):  #M en kg/mol, Tsol la température au sol
-    return P0*((Tsol-constante*altitude)/Tsol)**(M*9.81/(constante*8.31)) #Demo dans l'open office
+def passage_température_sol_pression(M,Tsol):  #M en kg/mol, Tsol la température au sol
+    return P0*((Tsol-constante*altitude)/Tsol)**(M*g/(constante*R)) #Demo dans l'open office
+
+#passage_temperature_sol_pression(32*10**-3,300)
+# 29961.576428490323
+
+
+
+def passage_carte_température_pression(M,matrice_température):  #M en kg/mol car g en m3/(kg.s)
+    n,m=len(matrice_température),len(matrice_température[0])
+    matrice_pression=np.zeros(n*m)
+    matrice_pression=matrice_pression.reshape(n,m)
+    for i in range(n):
+        for j in range(m):
+            matrice_pression[i][j]=passage_température_sol_pression(M,matrice_température[i][j])
+    return matrice_pression
+
+
+
+#passage_carte_température_pression(32*10**-3, matrice_type)
+# avec matrice_type: array([[301, 302, 303, 304, 305],
+       # [306, 307, 308, 309, 310],
+       # [311, 312, 313, 314, 315],
+       # [316, 317, 318, 319, 320],
+       # [321, 322, 323, 324, 325],
+       # [326, 327, 328, 329, 330],
+       # [331, 332, 333, 334, 335],
+       # [336, 337, 338, 339, 340],
+       # [341, 342, 343, 344, 345],
+       # [346, 347, 348, 349, 350]])
+
+# On obtient: array([[30089.57559298, 30217.21237519, 30344.48718533, 30471.40045348,
+       #  30597.95262898],
+       # [30724.14417994, 30849.97559274, 30975.44737149, 31100.5600376 ,
+       #  31225.31412926],
+       # [31349.71020099, 31473.74882317, 31597.43058161, 31720.75607711,
+       #  31843.72592502],
+       # [31966.34075485, 32088.60120981, 32210.50794648, 32332.06163434,
+       #  32453.26295547],
+       # [32574.1126041 , 32694.6112863 , 32814.7597196 , 32934.55863263,
+       #  33054.00876479],
+       # [33173.11086593, 33291.865696  , 33410.27402473, 33528.33663132,
+       #  33646.05430416],
+       # [33763.42784049, 33880.45804613, 33997.14573521, 34113.49172984,
+       #  34229.4968599 ],
+       # [34345.16196272, 34460.48788284, 34575.47547176, 34690.12558769,
+       #  34804.4390953 ],
+       # [34918.41686546, 35032.05977506, 35145.36870674, 35258.34454866,
+       #  35370.98819432],
+       # [35483.30054232, 35595.28249618, 35706.93496407, 35818.25885871,
+       #  35929.25509709]])
+
+
+
+
 
 #2 Travail passage carte de pression à carte d'accélération
 
@@ -67,7 +126,7 @@ def passage_temperature_sol_pression(M,Tsol):  #M en kg/mol, Tsol la températur
 
 n=10
 m=5
-matrice_type=np.arange(1,n*m+1)
+matrice_type=np.arange(1,n*m+1) + 300
 matrice_type=matrice_type.reshape(n,m)  #Matrice type pour faire des exemples simples
 
 
@@ -264,12 +323,12 @@ t_sortie_elementaire_final=arrondie_temps(t_sortie_elementaire,t_total/k)
 #1091319609200
 
 
-def passage_position_élémentaire(v_init,t_initial,i_sortie,j_sortie,n,liste,carte_pression):
-    """Entrée: le temps où l'on fait ce passage, les indices de sortie du bloc de particule, la quantité de particule élémentaire, la liste à l'instant t des éléments dans les pôles qui doivent être renvoyé. Cette liste est trié selon les temps
+def passage_position_élémentaire(v_init_x,v_init_y,t_initial,i_sortie,j_sortie,n,liste,carte_pression):
+    """Entrée: la vitesse de sortie du groupe de particules, le temps où l'on fait ce passage, les indices de sortie du bloc de particule, la quantité de particule élémentaire, la liste à l'instant t des éléments dans les pôles qui doivent être renvoyé. Cette liste est trié selon les temps. [i,j,t,v_x,v_y,n]
     Sortie: la liste à l'instant t + dt triée"""
     taille_liste=len(liste)
     distance,i_entrée,j_entrée=deplacement_aléatoire(i_sortie,j_sortie,carte_pression)
-    element=[i_entrée, j_entrée, arrondie_temps(temps_aléatoire(v_init,distance), t_total/k), n]    #Information sur l'element de matière considéré
+    element=[i_entrée, j_entrée, arrondie_temps(temps_aléatoire(v_init_x,distance), t_total/k),v_init_x, -v_init_y,n]    #Information sur l'element de matière considéré
     e=0
     for i in range(taille_liste):
         if element[2]>liste[i][2]:
@@ -280,8 +339,8 @@ def passage_position_élémentaire(v_init,t_initial,i_sortie,j_sortie,n,liste,ca
     return liste
 
 
-pas_elementaire=passage_position_élémentaire(2,100,2,4,10,[[1,2,10,30]],matrice_type)
-# [[1, 2, 10, 30], [2.0, 4, 951000, 10]]
+pas_elementaire=passage_position_élémentaire(2,4,100,2,4,10,[[1,2,10,15,12,30]],matrice_type)
+# [[1, 2, 10, 15, 12, 30], [1.0, 4, 31919600, 2, -4, 10]]
 
 #6 passage d'une carte des vitesses à l'instant t, d'une carte des quantités de matières à l'instant t et de la taille des cellules à une carte des vitesses à t + dt et une carte des quantités de matières à t + dt (def update_matière)
 
