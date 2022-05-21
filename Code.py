@@ -521,3 +521,33 @@ pas_elementaire=passage_position_élémentaire(2,4,100,2,4,10,[[1,2,10,15,12,30]
 
 #8 def extraction : table final -> Image avec les quantités de matières
 
+#9 Analyse des cartes
+
+Rt=6371000
+theta=23.0+26/60*100      #angle equateur/tropique (23°26')
+def distance_equateur_tropique():
+    """donne la distance equateur//tropique"""
+    return sqrt(2*(Rt**2)*(1+cos(theta)))
+
+def taille_pixel(carte):
+    return largeur_carte/len(carte[0])
+
+def hauteur_image(image):
+    """Renvoie la hauteur de l'image en m"""
+    a=taille_pixel(image)
+    return a*len(image)
+
+def nombre_pixel_image_equateur(image):
+    """Renvoie le nombre de pixel entre le haut de l'image et l'équateur"""
+    a=taille_pixel(image)
+    h=hauteur_image(image)
+    distance=h/2-distance_equateur_tropique()  #Distance réel entre le haut de la carte et le haut de la zone des tropiques
+    n_pix=int(distance/a)
+    return n_pix
+
+
+def pixel_debut_fin(image):
+    """Renvoie le 1er et le dernier pixel définissant la zone des tropiques sur une colonne"""
+    n_pix=nombre_pixel_image_equateur(image)
+    a=taille_pixel(image)
+    return n_pix,n_pix + int(2*distance_equateur_tropique()/a)
