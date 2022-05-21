@@ -4,52 +4,153 @@ from math import *
 import random
 #1: Passage d'une carte net à une carte de pression
 
-#Travail sur tkinter
-#mainapp=tkinter.Tk() #construction de la fenêtre tkinter
-#mainapp.title("Programme TIPE")
-#mainapp.minsize(640,480) #Taille minimale de l'image par défaut
-#mainapp.maxsize(1280,720) #Idem mais l'inverse
-#mainapp.resizable(width=False, height=True) #Autorise ou non de s'étendre en hauteur ou en largeur
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
 
-#mainapp.geometry("800x600") #800 pixels x 600 pixels
+Image = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Couleur_rogné.PNG" )
+image_array = np.asarray( Image )    #asarray pour empecher la modification de l'image
 
-#label_welcome=tkinter.Label(mainapp, text="coucou")
-
-#print(label_welcome.cget("text")) #Ecrit dans le shell l'élément appelé, ici le texte de label_welcome
-
-#label_welcome.config(text="Nouveau message") #permet de modifier le paramètre d'un widget
-
-#entry_name=tkinter.Entry(mainapp,width=45) #Créer une barre de taille 45 dans lequel on peut écrire
-
-#label_welcome.pack()
-#mainapp.mainloop() #boucle infini jusqu'à un certain moment
-#Resultat= Un widget (une fenêtre en gros)
+# plt.imshow( image_array )
+# plt.show()
 
 
 
+# Creation image
 
 
-#Travail sur l'image du monde
-
-# fen=Tk()
-# fen.attributes("-fullscreen",1)
-#
-# fond=Canvas(fen,width=1920, height=1080, highlightthickness=1,bg='red')
-# fond.place(x=0,y=0)
-# fichier=PhotoImage(r"C:\Users\Jean-Baptiste\Desktop\Prépa MPSI\Carte.png")
-# #image=fond.create_image(150,100,image=fichier,anchor="nw")
-# fichier
-# plt.chow()
-#
-#
-#
-#
-#
-#
-#
-# fen.mainloop()
+hauteur = 100
+largeur = 300
+# mode RGB
+canal = 3
+new_array_RGB = np.zeros([hauteur, largeur, canal], dtype = np.uint8)
 
 
+#Modification de l'image
+
+# rouge : première tranche 0, 100
+new_array_RGB[:,:100,:] = (255, 0, 0)
+# vert : deuxième tranche 100, 200
+new_array_RGB[:,100:200,:] = (0, 255, 0)
+# bleu : Troisième tranche 200, 300
+new_array_RGB[:,200:,:] = (0, 0, 255)
+
+
+
+passage_couleur_température=np.array( [[[73,61,217],[73,93,223],[85,74,219],-14 ], [[80,128,232],[93,163,241],[91,136,233],-10 ], [[105,193,248],[116,213,251],[113,191,247],-6 ], [[153,230,255],[179,238,249],[138,225,245],-2 ], [[51,242,150],[51,233,217],[97,240,177],2 ], [[51,211,109],[64,194,149],[45,171,125], 6], [[84,149,125],[51,142,84],[33,119,64], 10],  [[99,180,86],[148,217,89],[124,189,69],14 ], [[196,255,92],[224,249,180],[169,225,72],18 ],  [[255,248,51],[249,229,60],[225,218,33],22 ],  [[253,213,61],[253,189,55],[223,185,42],26 ], [[249,161,51],[255,133,51],[255,140,64],30 ], [[253,114,51],[255,52,255],[254,66,64],34 ],[[245,72,51],[245,70,129],[246,82,136],38 ], [[245,69,255],[221,63,163],[221,80,183],42 ], [[195,58,121],[170,53,77],[199,71,129],46 ]],dtype=object)
+
+matrice_couleur=np.array([[[245,69,255,255],[99,180,86, 255],[195,58,121, 255]],[[253,213,61,255],[169,225,72,255] ,[255,248,51, 255] ]])
+#Matrice 42,14,46// 26,18,22
+
+
+def verification_1(liste):
+    for i in range(len(liste)//2):
+        if liste[2*i]==0:
+            return False
+    return True
+
+def liste_pixels_possibles(i,j,carte):
+    """Renvoie une liste de 16*3*2 éléments. Il s'agit des pixels possibles ou non de passage_couleur_température pouvant désigner la température de carte[i][j]. Ils sont accollés à un 0 ou un 1 selon que ce pixel soit possible ou non"""
+    liste=[]
+    for k in range(16):  #la liste passage_couleur_température contient 16 éléments
+        for e in range(3):
+            b=0      #0=True et 1= False
+            for f in range(3):
+                if abs(passage_couleur_température[k][e][f] - carte[i][j][f])>=40:   # Lien entre les pixels et les couleurs
+                    b=1
+            liste.append(b)   #Au final, elle est de de taille 16*3*2. Les 0 donnent les triplets cohérent en température
+            liste.append(e)
+    return liste
+
+
+température=np.zeros(6)
+température=température.reshape(2,3)
+
+
+def liste_pixels_possibles_2(i,j,carte,matrice_température):
+    """Idem mais en vérifiant une certaine continuité entre la case et la case précédente sur la ligne"""
+    liste=[]
+    for k in range(16):  #la liste passage_couleur_température contient 16 éléments
+        for e in range(3):
+            b=0
+            for f in range(3):
+                if abs(passage_couleur_température[k][e][f] - carte[i][j][f])>=40:   # Lien entre les pixels et les couleurs
+                    b=1
+            if abs(matrice_température[i][j-1] - passage_couleur_température[k][3])>=12: #Condition de continuité de la température
+                b=1
+           # print(k)
+           # print(b)
+            liste.append(b)   #Finalement, elle est de de taille 16. Les True donnent les lieux cohérent en température
+            liste.append(e)
+    return liste
+
+
+
+def indice_RGB(carte,liste,i,j,e,n):
+    """Donne l'indice dans la liste correspondant à la température associé au pixel étudié"""
+    indice=0
+    for k in range(16):
+        valeur=1000     #Ecart entre le pixel étudié est celui de référence
+        if liste[6*k]==0 or liste[6*k+2]==0 or liste[6*k+4]==0:
+            rep=True    #La température associée à ces 3 éléments est possible
+            if liste[k*6]==0:
+                e=liste[6*k+1]    #e est le triplet RGB possiblement caractéristique du pixel étudié
+                valeur1=0
+                for f in range(3):
+                    valeur1+=abs(passage_couleur_température[k][e][f] - carte[i][j][f])
+                valeur=min(valeur,valeur1)
+            elif liste[6*k+2]==0 :
+                e=liste[6*k+2]
+                valeur2=0
+                for f in range(3):
+                    valeur2+=abs(passage_couleur_température[k][e][f] - carte[i][j][f])
+                valeur=min(valeur,valeur2)    #On conserve la difference la plus faible
+            elif liste[6*k+4]==0:
+                e=liste[6*k+5]
+                valeur3=0
+                for f in range(3):
+                    valeur3+=abs(passage_couleur_température[k][e][f] - carte[i][j][f])
+                valeur=min(valeur,valeur3)
+        else:
+            valeur=1000      #Cas d'une température non caractéristique du pixel
+        if valeur<n:
+            n=valeur
+            indice=k
+    return indice
+
+liste_pix=liste_pixels_possibles_2(1,2,matrice_couleur,température)
+
+
+def passage_carte_couleur_carte_température(carte):
+    n,m=len(carte),len(carte[0])
+    mat_temp=np.zeros(n*m)
+    mat_temp=mat_temp.reshape(n,m)
+    for i in range(n):
+        liste_couleur=liste_pixels_possibles(i,0,carte)
+        indice=indice_RGB(carte,liste_couleur,i,0,e,1000)    #indice de la liste numpy associé à la température à renvoyer. 1000 car les différences entre les pixels étudiés et les pixels de références sont bien inférieur à 1000
+        mat_temp[i][0]=passage_couleur_température[indice][3]
+
+        for j in range(1,m):            #On traite le cas général
+            liste_couleur=liste_pixels_possibles_2(i,j,carte,mat_temp)
+
+            if verification_1(liste_couleur):
+                mat_temp[i][j]=mat_temp[i][j-1]    #On s'assure de la continuité avec la cae précédente si le pixel est illisible
+            else:
+                rep=False
+                indice=indice_RGB(carte,liste_couleur,i,j,e,1000)
+                if rep:
+                    mat_temp[i][j]=mat_temp[i][j-1]
+                else:
+                    mat_temp[i][j]=passage_couleur_température[indice][3]  #On extraie la température associée  à l'indice pour lequel cette différence est la plus faible
+    return mat_temp
+
+
+#verification: la commande passage_carte_couleur_carte_température(matrice_couleur) renvoie:
+#array([[42., 42., 46.],
+ #      [26., 18., 22.]])
+
+
+#matrice=passage_carte_couleur_carte_température(image_array)
 
 
 # Travail sur le passage de carte de température au sol à carte de pression
@@ -347,3 +448,4 @@ pas_elementaire=passage_position_élémentaire(2,4,100,2,4,10,[[1,2,10,15,12,30]
 #7 Création de la fonction totale : temps de la mesure finale, table initial, carte accélération -> Table final
 
 #8 def extraction : table final -> Image avec les quantités de matières
+
