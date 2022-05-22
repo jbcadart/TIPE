@@ -501,7 +501,7 @@ def passage_position_élémentaire(v_init_x,v_init_y,t_initial,i_sortie,j_sortie
     Sortie: la liste à l'instant t + dt triée"""
     taille_liste=len(liste)
     distance,i_entrée,j_entrée=deplacement_aléatoire(i_sortie,j_sortie,carte_pression)
-    element=[i_entrée, j_entrée, arrondie_temps(temps_aléatoire(v_init_x,distance), t_total/k),v_init_x, -v_init_y,n]    #Information sur l'element de matière considéré
+    element=[i_entrée, j_entrée,t_initial + arrondie_temps(temps_aléatoire(v_init_x,distance), t_total/k),v_init_x, -v_init_y,n]    #Information sur l'element de matière considéré
     e=0
     for i in range(taille_liste):
         if element[2]>liste[i][2]:
