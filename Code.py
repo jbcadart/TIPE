@@ -628,3 +628,77 @@ for i in range(longueurMondeCell):
 
 
 
+
+
+#5 Travail sur les pôles
+
+t_total=1000000
+k=10000
+
+
+def intervalle_temps(t_total,k):
+    return t_total/k
+
+
+
+def deplacement_aléatoire(i_sortie,j_sortie,carte_pression):
+    """Entrée: les indices de la case de sortie de la quantité de matière
+       Sortie: la distance entre le point d'entrée et le bord de la carte et les indices de la case d'entrée"""
+    distance=random.randint(0,largeur_carte)
+    hauteur_case,largeur_case=taille_case(carte_pression)
+    distance_totale=largeur_case * i_sortie + distance    #distance par rapport au bord
+    if distance_totale>largeur_carte:
+        distance_totale=distance_totale - largeur_carte
+        i_entrée=distance_totale//largeur_case
+    else:
+       i_entrée=distance_totale//largeur_case
+    if distance_totale<i_sortie*largeur_case:
+        distance= -distance       #On prend en compte le fait que la molecule peut se deplacer vers la gauche
+    return distance, i_entrée, j_sortie
+
+
+def temps_aléatoire(v_init_x,distance):
+    """Entrée: la distance entre le point de sortie est d'entrée et la vitesse de sortie selon x
+       Sortie: le temps aléatoire pour lequel la particule ressort du pôle"""
+    temps_min=abs(distance)/abs(v_init_x)
+    temps_min += random.randint(0,int(temps_min))   #On met un int car ne marche pas avec un float
+    return temps_min
+
+i=4
+j=2
+dist,i_entrée_elementaire, j_sortie_elementaire=deplacement_aléatoire(i,j,matrice_type)
+t_sortie_elementaire=temps_aléatoire(matrice_vitesse_x_apres[i][j],dist)
+
+#dist=6069401, i_entrée_elementaire=4.0, j_sortie_elementaire=2
+#t_sortie_elementaire=1091319609267.9999
+
+
+def arrondie_temps(t,dt):
+    """Entrée: un temps, dt
+       Sortie: le nombre de dt nécessaire pour atteindre t"""
+    return int(dt*(t//dt))
+
+
+t_sortie_elementaire_final=arrondie_temps(t_sortie_elementaire,t_total/k)
+
+#1091319609200
+
+
+def transition_position_élémentaire(v_init_x,v_init_y,t_initial,i_sortie,j_sortie,n,liste,carte_pression):
+    """Entrée: la vitesse de sortie du groupe de particules, le temps où l'on fait ce passage, les indices de sortie du bloc de particule, la quantité de particule élémentaire, la liste à l'instant t des éléments dans les pôles qui doivent être renvoyé. Cette liste est trié selon les temps. [i,j,t,v_x,v_y,n]
+    Sortie: la liste à l'instant t + dt triée"""
+    taille_liste=len(liste)
+    distance,i_entrée,j_entrée=deplacement_aléatoire(i_sortie,j_sortie,carte_pression)
+    element=[i_entrée, j_entrée,t_initial + arrondie_temps(temps_aléatoire(v_init_x,distance), t_total/k),v_init_x, -v_init_y,n]    #Information sur l'element de matière considéré
+    e=0
+    for i in range(taille_liste):
+        if element[2]>liste[i][2]:
+            e+=1           #indice d'injection des informations sur la quantité elementaire
+        else:
+            break
+    liste.insert(e,element)
+    return liste
+
+
+pas_elementaire=transition_position_élémentaire(2,4,100,2,4,10,[[1,2,10,15,12,30]],matrice_type)
+# [[1, 2, 10, 15, 12, 30], [1.0, 4, 31919600, 2, -4, 10]]
