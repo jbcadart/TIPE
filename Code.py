@@ -370,6 +370,10 @@ class Cell:
 
 class Carte: #l'objet que doit gérer Jb
 
+   
+#3: Passage d'une situation initiale (quantité de matière initiale, sa position, la vitesse initiale en tout point) à une table de l'instant initiale
+
+
     def __init__(self): #Par exemple
 
         self.cells = []
@@ -462,7 +466,7 @@ class Carte: #l'objet que doit gérer Jb
         #donc return [ [cell, float]; [...] ]
         return rep
 
-
+    #4 Passage de la carte des vitesses de l'instant t à l'instant t+dt
     def accToVitesse(self, cell):
         cell.v += cell.a * dt
 
