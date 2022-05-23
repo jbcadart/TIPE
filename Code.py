@@ -918,3 +918,9 @@ def pixel_debut_fin(image):
     n_pix=nombre_pixel_image_equateur(image)
     a=taille_pixel(image)
     return n_pix,n_pix + int(2*distance_equateur_tropique()/a)
+
+
+
+
+
+#test
