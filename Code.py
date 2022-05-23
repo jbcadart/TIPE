@@ -35,6 +35,66 @@ def dist(a, b):
 
 
 
+
+
+#================================================================
+
+#ALERT !!
+#Les coord de mes Cell sont TOUJOURS celles de son CENTRE (et pas celles de son coin bas gauche)
+#ALERT !!
+
+#On travaille en radians et en mètres
+#le point de coordonées 0,0 se trouve en long = 0, lat = -latitudeMaxPoles
+#la case d'indice 0, 0 se trouve en long = 0, lat = -latitudeMaxPoles
+
+
+#constantes physiques
+rayonTerre = 6.371e6
+masse_vol_soufre = 32*10**-3    #je n'e ai actuellement aucune idée
+
+#constantes relatives à la carte
+#suseptibles d'être changées
+largeurMondeCell  = 20 #nombre de Cells en largeur  (en Y)
+longueurMondeCell = 50 #nombre de Cells en longueur (en X)
+
+#on se place au level 80
+#donc
+a_lnsp =19620.042969
+b_lnsp = 0.068448
+
+
+
+latitudeMaxPoles = radians(45)                   #Au dessus de cet angle, on est dans les pôles
+#donc
+largeurMonde = 2*rayonTerre*sin(latitudeMaxPoles)                       #taille (en mètre) (et en Y) du monde
+longueurMonde = 2*pi*rayonTerre                                         #taille (en mètre) (et en X) du monde
+#donc
+largeurCell = largeurMonde/largeurMondeCell   # (en mètre) la taille (en Y) d'une cell
+longueurCell = longueurMonde/longueurMondeCell # (en mètre) de même
+hauteurCell  = 10   # (en mètre) complétement arbitraire, ne sert que pour l'homogénéité des formules
+#donc
+A0 = largeurCell * longueurCell  #Aire d'une Cell
+V0 = A0 * hauteurCell           #Volume d'une Cell
+
+tkLongueurCell = 20 #(en pixel, uniquement pour le dessin)
+tkLargeurCell = 20 #(en pixel, uniquement pour le dessin)
+
+
+dt = 1
+
+#constante calcul pression
+constante=3.9*10**(-3)  #Constante  calculé dans la démo de la fonction passage_temperature_sol_pression(M,Tsol) dans l'open office
+P0=100000
+altitude=9000   #La température ne varie pas entre 9 et 20 km (à peu près)
+g=9.81
+R=8.31
+
+def taille_case(carte_pression):
+    """Prend la carte de pression et renvoie la taille réel des cases en m (hauteur de la case, largeur de la case)"""
+    n,m=len(carte_pression),len(carte_pression[0])
+    return largeurCell,longueurCell
+
+
 #----------------------
 
 
@@ -262,57 +322,6 @@ def passage_carte_couleur_carte_température(carte):
 """On écrit d'abord des constantes"""
 
 
-#================================================================
-
-#ALERT !!
-#Les coord de mes Cell sont TOUJOURS celles de son CENTRE (et pas celles de son coin bas gauche)
-#ALERT !!
-
-#On travaille en radians et en mètres
-#le point de coordonées 0,0 se trouve en long = 0, lat = -latitudeMaxPoles
-#la case d'indice 0, 0 se trouve en long = 0, lat = -latitudeMaxPoles
-
-
-#constantes physiques
-rayonTerre = 6.371e6
-masse_vol_soufre = 32*10**-3    #je n'e ai actuellement aucune idée
-
-#constantes relatives à la carte
-#suseptibles d'être changées
-largeurMondeCell  = 20 #nombre de Cells en largeur  (en Y)
-longueurMondeCell = 50 #nombre de Cells en longueur (en X)
-
-#on se place au level 80
-#donc
-a_lnsp =19620.042969
-b_lnsp = 0.068448
-
-
-
-latitudeMaxPoles = radians(45)                   #Au dessus de cet angle, on est dans les pôles
-#donc
-largeurMonde = 2*rayonTerre*sin(latitudeMaxPoles)                       #taille (en mètre) (et en Y) du monde
-longueurMonde = 2*pi*rayonTerre                                         #taille (en mètre) (et en X) du monde
-#donc
-largeurCell = largeurMonde/largeurMondeCell   # (en mètre) la taille (en Y) d'une cell
-longueurCell = longueurMonde/longueurMondeCell # (en mètre) de même
-hauteurCell  = 10   # (en mètre) complétement arbitraire, ne sert que pour l'homogénéité des formules
-#donc
-A0 = largeurCell * longueurCell  #Aire d'une Cell
-V0 = A0 * hauteurCell           #Volume d'une Cell
-
-tkLongueurCell = 20 #(en pixel, uniquement pour le dessin)
-tkLargeurCell = 20 #(en pixel, uniquement pour le dessin)
-
-
-dt = 1
-
-#constante calcul pression
-constante=3.9*10**(-3)  #Constante  calculé dans la démo de la fonction passage_temperature_sol_pression(M,Tsol) dans l'open office
-P0=100000
-altitude=9000   #La température ne varie pas entre 9 et 20 km (à peu près)
-g=9.81
-R=8.31
 
 
 #Travail Théo
