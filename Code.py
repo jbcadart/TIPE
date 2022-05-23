@@ -1,3 +1,5 @@
+print("alakazoum...")
+
 from tkinter import *
 import numpy as np
 from math import *
@@ -13,6 +15,9 @@ import tkinter as tk
 from tkinter import ttk
 
 import json
+from datetime import datetime
+import time
+
 
 
 class Vect2(tuple):
@@ -84,7 +89,8 @@ V0 = A0 * hauteurCell           #Volume d'une Cell
 
 tkLongueurCell = 20 #(en pixel, uniquement pour le dessin)
 tkLargeurCell = 20 #(en pixel, uniquement pour le dessin)
-
+tkOffsetX = 100
+tkOffsetY = 100
 
 #intervalle temps
 t_total=1000000
@@ -114,10 +120,10 @@ satSoufre = 20 #au pif pour l'instant
 
 
 #----------------------
+print("Constantes + import ok !")
 
 
-
-Image = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Couleur_rogné.PNG" )
+Image = Image.open( r"C:\Users\Jean-Baptiste\Desktop\Prépa MPSI\TIPE\Capture.21.05.2022.PNG" )
 image_array = np.asarray( Image )    #asarray pour empecher la modification de l'image
 
 # plt.imshow( image_array )
@@ -147,8 +153,8 @@ def liste_pixels_possibles(i,j,carte):
 
 
 
-température=np.zeros(6)
-température=température.reshape(2,3)
+#température=np.zeros(6)
+#température=température.reshape(2,3)
 
 
 
@@ -245,7 +251,7 @@ def passage_carte_couleur_carte_température(carte):
                     mat_temp[i][j]=mat_temp[i-1][j]
     return mat_temp
 
-
+print("Image Pixel ok !")
 
 #matrice_temp_couleur=passage_carte_couleur_carte_température(matrice_couleur)
 
@@ -259,14 +265,12 @@ def passage_carte_couleur_carte_température(carte):
 # with open('output.txt','w') as f1:
 #     json.dump(matrice.tolist(),f1)
 
+
 #matrice[120]
 
+print("matrice temp ok !")
 
-#2 Passage carte de température à carte de température moyennée
-
-"""On écrit d'abord des constantes"""
-
-
+#définition de Carte et Cell, soit le "meat and potatoes" de la simulation
 
 
 #Travail Théo
@@ -468,7 +472,7 @@ class Carte: #l'objet que doit gérer Jb
         for i in range(longueurMondeCell):
             matRep.append([])
             for j in range(largeurMondeCell):
-                matRep[i].append(self.cells[i][j].pressure)
+                matRep[i].append(self.cells[i][j].pression)
          
         return matRep
         
@@ -502,16 +506,16 @@ def Draw():
     tk.update_idletasks()
     tk.update()
 
-def animate (carte0, carte_pression):
+def animate (carte0):
     
     Update(carte0, carte0.matrice_Pression())
     
     timeNOW += dt
+    print(timeNOW)
    
     time.sleep(0.01)
 
-    
-    
+print("Cells + Carte ok !")  
     
     
     
@@ -593,7 +597,7 @@ def passage_carte_pression_carte_acceleration_selon_x_et_y (carte_pression):
     matX = passage_carte_pression_carte_acceleration_selon_x(masse_vol_soufre, carte_pression)
     matY = passage_carte_pression_carte_acceleration_selon_y(masse_vol_soufre, carte_pression)
 
-    (n, m) = matX.shape
+    (n, m) = len(carte_pression), len(carte_pression[0])
     mat_fin = []
     for i in range(n):
         mat_fin.append([])
@@ -602,8 +606,7 @@ def passage_carte_pression_carte_acceleration_selon_x_et_y (carte_pression):
             
     return mat_fin
                                                                
-                                                                 
-                                                                 
+                                                                                                                              
 
 #5 Travail sur les pôles
 
@@ -655,7 +658,7 @@ def transition_position_élémentaire(v_init,t_initial,i_sortie,j_sortie,m):
 # pas_elementaire=transition_position_élémentaire(2,4,100,2,4,10,[[1,2,10,15,12,30]],matrice_type)
 # [[1, 2, 10, 15, 12, 30], [1.0, 4, 31919600, 2, -4, 10]]
 
-                                                                 
+print("import + logique poles ok !")   
                                                                  
 #===========================================================================================================================================================================                                                          
 #====================================================================================================================================================================================================
@@ -665,11 +668,11 @@ def transition_position_élémentaire(v_init,t_initial,i_sortie,j_sortie,m):
 
 #========================================================================================================================================================================
 #========================================================================================================================================================================
-
+print("on commence !!!!!!!!!!!")
 
 carte_init=Carte()
 importBigArray(carte_init,matrice)
-
+carte_init.cells[15][15].m += 50
 
 for i in range(longueurMondeCell):
     ls = []
@@ -677,7 +680,7 @@ for i in range(longueurMondeCell):
         ls.append(carte_init.cells[i][j].val)
     #print(ls)
                                                                  
- while 1:
-    animate()                                                                
+while True:
+    animate(carte_init)                                                                
                                                                  
                                                                  
