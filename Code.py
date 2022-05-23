@@ -584,13 +584,28 @@ def passage_carte_pression_carte_acceleration_selon_y(masse_volumique,carte_pres
             liste.append((carte_pression[i][j] - carte_pression[i+1][j])/(dy*masse_volumique))
         matrice_1_y.append(liste)
     matrice_final=[]
+    # for j in range(m):
+    #     liste=[]
+    #     liste.append(matrice_1_y[0][j])   #On considère que l'accélération sur la 1 ere case est l'accélération au bord inférieur
+    #     for i in range(n-2):
+    #         liste.append((matrice_1_y[i][j] + matrice_1_y[i+1][j])/2)
+    #     liste.append(matrice_1_y[n-2][j])
+    #     matrice_final.append(liste)
+    #
+    liste=[]
     for j in range(m):
+        liste.append(matrice_1_y[0][j])
+    matrice_final.append(liste)
+    for i in range(n-2):
         liste=[]
-        liste.append(matrice_1_y[0][j])   #On considère que l'accélération sur la 1 ere case est l'accélération au bord inférieur
-        for i in range(n-2):
+        for j in range(m):
             liste.append((matrice_1_y[i][j] + matrice_1_y[i+1][j])/2)
-        liste.append(matrice_1_y[n-2][j])
+       # liste.append(matrice_1_y[n-2][j])
         matrice_final.append(liste)
+    liste=[]
+    for j in range(m):
+        liste.append(matrice_1_y[n-2][j])
+    matrice_final.append(liste)
     return matrice_final
 
 def passage_carte_pression_carte_acceleration_selon_x_et_y (carte_pression):
