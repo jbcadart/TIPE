@@ -348,6 +348,9 @@ class Cell:
             #variables seulement pour l'importation de la base de données
             self.val = 0
             self.nbData = 0
+            
+            #vraies variables
+            self.ls =[]
 
         else:
             self.m = masse                                          #masse de SOUFRE dans la Cell
@@ -491,7 +494,7 @@ class Carte: #l'objet que doit gérer Jb
                 for e in destinations:
                     if e.estUnPole:
                         #à remplir
-                        a = 1
+                        e.ls += [transition_position_élémentaire(
                     else:
                         e[0].val += m0*e[1]    #on le met dans .val temporairement car on ne peut pas le mettre directement dans .m
 
