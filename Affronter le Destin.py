@@ -72,7 +72,8 @@ def rgb_hack(rgb):
 
 #constantes physiques
 rayonTerre = 6.371e6
-masse_vol_soufre = 32*10**-3    #je n'e ai actuellement aucune idée
+masse_mol_soufre = (2*16+32)*10**-3    #SO_2 est l'élément considéré
+masse_vol_air=0.0135   #en kg/m-3
 timeNOW = 0
 
 #constantes relatives à la carte
@@ -136,19 +137,38 @@ label = Label(root, textvariable=textDate, relief=RAISED)
 
 #Couleurs tkinter
 #couleur quand il n'y a pas de soufre
-color0 = (220, 220, 190)
+color0 = (255, 255, 255)
 
 #couleur quand il y a satSoufre ou plus
 colorMax = (255, 70, 35)
-satSoufre = 1000 #au pif pour l'instant
+satSoufre = 100#au pif pour l'instant
 
 
 #----------------------
 print("Constantes + import ok !")
 
 
-Image = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.21.05.2022.PNG" )
-image_array = np.asarray( Image )    #asarray pour empecher la modification de l'image
+Image1 = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.21.05.2022.PNG" )
+image_array1 = np.asarray( Image1 )    #asarray pour empecher la modification de l'image
+
+Image2 = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.22.05.2022.PNG" )
+image_array2 = np.asarray( Image2 )    #asarray pour empecher la modification de l'image
+
+Image3 = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.23.05.2022.PNG" )
+image_array3 = np.asarray( Image3 )    #asarray pour empecher la modification de l'image
+
+Image4 = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.24.05.2022.PNG" )
+image_array4 = np.asarray( Image4 )    #asarray pour empecher la modification de l'image
+
+Image5 = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.25.05.2022.PNG" )
+image_array5 = np.asarray( Image5 )    #asarray pour empecher la modification de l'image
+
+Image6 = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.26.05.2022.PNG" )
+image_array6 = np.asarray( Image6 )    #asarray pour empecher la modification de l'image
+
+Image7 = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.27.05.2022.PNG" )
+image_array7 = np.asarray( Image7 )    #asarray pour empecher la modification de l'image
+
 
 # plt.imshow( image_array )
 # plt.show()
@@ -284,47 +304,75 @@ print("Image Pixel ok !")
  #      [26., 18., 22.]])
 
 
-# matrice1=passage_carte_couleur_carte_température(image_array)
+# matrice1=passage_carte_couleur_carte_température(image_array1)
 # 
 # with open('matrice1.txt','w') as f1:
 #     json.dump(matrice1.tolist(),f1)
-
-# matrice2=passage_carte_couleur_carte_température(image_array)
+# 
+# print("matrice1 ok!")
+# 
+# matrice2=passage_carte_couleur_carte_température(image_array2)
 # 
 # with open('matrice2.txt','w') as f2:
 #     json.dump(matrice2.tolist(),f2)
-
-
-# matrice3=passage_carte_couleur_carte_température(image_array)
+# 
+# print("matrice2 ok!")
+# 
+# matrice3=passage_carte_couleur_carte_température(image_array3)
 # 
 # with open('matrice3.txt','w') as f3:
 #     json.dump(matrice3.tolist(),f3)
-
-# matrice4=passage_carte_couleur_carte_température(image_array)
+# 
+# print("matrice3 ok!")
+# 
+# matrice4=passage_carte_couleur_carte_température(image_array4)
 # 
 # with open('matrice4.txt','w') as f4:
 #     json.dump(matrice4.tolist(),f4)
-
-# matrice5=passage_carte_couleur_carte_température(image_array)
+# 
+# print("matrice4 ok!")
+# 
+# matrice5=passage_carte_couleur_carte_température(image_array5)
 # 
 # with open('matrice5.txt','w') as f5:
 #     json.dump(matrice5.tolist(),f5)
-
-# matrice6=passage_carte_couleur_carte_température(image_array)
+# 
+# print("matrice5 ok!")
+# 
+# matrice6=passage_carte_couleur_carte_température(image_array6)
 # 
 # with open('matrice6.txt','w') as f6:
 #     json.dump(matrice6.tolist(),f6)
-
-# matrice7=passage_carte_couleur_carte_température(image_array)
+# 
+# print("matrice6 ok!")
+# 
+# matrice7=passage_carte_couleur_carte_température(image_array7)
 # 
 # with open('matrice7.txt','w') as f7:
 #     json.dump(matrice7.tolist(),f7)
-
-
+# 
+# print("matrice7 ok!")
 
 f = open("matrice1.txt")
 matrice1 = np.array(json.load(f))
 
+f = open("matrice2.txt")
+matrice2 = np.array(json.load(f))
+
+f = open("matrice3.txt")
+matrice3 = np.array(json.load(f))
+
+f = open("matrice4.txt")
+matrice4 = np.array(json.load(f))
+
+f = open("matrice5.txt")
+matrice5 = np.array(json.load(f))
+
+f = open("matrice6.txt")
+matrice6 = np.array(json.load(f))
+
+f = open("matrice7.txt")
+matrice7 = np.array(json.load(f))
 #matrice[120]
 
 print("matrice temp ok !")
@@ -570,7 +618,7 @@ class Carte: #l'objet que doit gérer Jb
         for i in range(longueurMondeCell):
             for j in range(largeurMondeCell):
                 c0 = self.cells[i][j]
-                c0.pression = P0*((c0.val + 273.15-constante*altitude)/(c0.val+273.15))**(masse_vol_soufre*g/(constante*R))
+                c0.pression = P0*((c0.val + 273.15-constante*altitude)/(c0.val+273.15))**(masse_mol_soufre*g/(constante*R))
                 c0.val = 0
                 
     def getMasseTropique (self):
@@ -621,7 +669,11 @@ def importBigArray(carte0, ba):
 
     n = len(ba)
     m = len(ba[0])
-
+    for i in range(longueurMondeCell):
+        for j in range(largeurMondeCell):
+            if (carte0.cells[i][j].nbData != 0):
+                carte0.cells[i][j].val = 0
+                carte0.cells[i][j].nbData = 0
     #on calcule la taille (en "mètres") d'un pixel
     longueurPixelX = longueurMonde/m
     largeurPixelY = largeurMonde/n
@@ -694,8 +746,8 @@ def passage_carte_pression_carte_acceleration_selon_y(masse_volumique,carte_pres
     return matrice_final
 
 def passage_carte_pression_carte_acceleration_selon_x_et_y (carte_pression):
-    matX = passage_carte_pression_carte_acceleration_selon_x(masse_vol_soufre, carte_pression)
-    matY = passage_carte_pression_carte_acceleration_selon_y(masse_vol_soufre, carte_pression)
+    matX = passage_carte_pression_carte_acceleration_selon_x(masse_vol_air, carte_pression)
+    matY = passage_carte_pression_carte_acceleration_selon_y(masse_vol_air, carte_pression)
 
     (n, m) = len(matX), len(matX[0])
     mat_fin = []
@@ -800,16 +852,10 @@ print("import + logique poles ok !")
 print("on commence !!!!!!!!!!!")
 
 carte_init=Carte()
-importBigArray(carte_init,matrice)
+importBigArray(carte_init,matrice1)
 carte_init.cells[75][30].m += 1000
 Draw(carte_init)
 
-for i in range(longueurMondeCell):
-    ls = []
-    for j in range(largeurMondeCell):
-        ls.append(carte_init.cells[i][j].val)
-    #print(ls)
-   
 indice_max=k
 indice=0   
                                                                  
@@ -819,6 +865,55 @@ while indice<=indice_max:
     print("t =", timeNOW)
     print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
     timeNOW += dt
+    importBigArray(carte_init,matrice2)
+    indice+=1
+    
+    print(indice)
+    animate(carte_init)
+    print("t =", timeNOW)
+    print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
+    timeNOW += dt
+    importBigArray(carte_init,matrice3)
+    indice+=1
+    
+    print(indice)
+    animate(carte_init)
+    print("t =", timeNOW)
+    print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
+    timeNOW += dt
+    importBigArray(carte_init,matrice4)
+    indice+=1
+    
+    print(indice)
+    animate(carte_init)
+    print("t =", timeNOW)
+    print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
+    timeNOW += dt
+    importBigArray(carte_init,matrice5)
+    indice+=1
+    
+    print(indice)
+    animate(carte_init)
+    print("t =", timeNOW)
+    print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
+    timeNOW += dt
+    importBigArray(carte_init,matrice6)
+    indice+=1
+    
+    print(indice)
+    animate(carte_init)
+    print("t =", timeNOW)
+    print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
+    timeNOW += dt
+    importBigArray(carte_init,matrice7)
+    indice+=1
+    
+    print(indice)
+    animate(carte_init)
+    print("t =", timeNOW)
+    print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
+    timeNOW += dt
+    importBigArray(carte_init,matrice1)
     indice+=1
                                                                  
 
