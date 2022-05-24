@@ -77,13 +77,11 @@ timeNOW = 0
 
 #constantes relatives à la carte
 #suseptibles d'être changées
-largeurMondeCell  = 20 #nombre de Cells en largeur  (en Y)
-longueurMondeCell = 50 #nombre de Cells en longueur (en X)
+largeurMondeCell  = 60# nombre de Cells en largeur  (en Y)
+longueurMondeCell = 150 #nombre de Cells en longueur (en X)
 
 #on se place au level 80
 #donc
-a_lnsp =19620.042969
-b_lnsp = 0.068448
 
 
 
@@ -117,8 +115,8 @@ R=8.31
 
 
 
-tkLongueurCell = 20 #(en pixel, uniquement pour le dessin)
-tkLargeurCell = 20 #(en pixel, uniquement pour le dessin)
+tkLongueurCell = 7 #(en pixel, uniquement pour le dessin)
+tkLargeurCell = 7 #(en pixel, uniquement pour le dessin)
 tkOffsetX = 100
 tkOffsetY = 100
 tkTailleVect = 15
@@ -142,14 +140,14 @@ color0 = (220, 220, 190)
 
 #couleur quand il y a satSoufre ou plus
 colorMax = (255, 70, 35)
-satSoufre = 50 #au pif pour l'instant
+satSoufre = 1000 #au pif pour l'instant
 
 
 #----------------------
 print("Constantes + import ok !")
 
 
-Image = Image.open( r"Couleur_rogné.png" )
+Image = Image.open( r"C:\Users\Jean-Baptiste\Pictures\Carte TIPE\Capture.21.05.2022.PNG" )
 image_array = np.asarray( Image )    #asarray pour empecher la modification de l'image
 
 # plt.imshow( image_array )
@@ -286,13 +284,46 @@ print("Image Pixel ok !")
  #      [26., 18., 22.]])
 
 
-# matrice=passage_carte_couleur_carte_température(image_array)
+# matrice1=passage_carte_couleur_carte_température(image_array)
 # 
-# with open('output.txt','w') as f1:
-#     json.dump(matrice.tolist(),f1)
+# with open('matrice1.txt','w') as f1:
+#     json.dump(matrice1.tolist(),f1)
 
-f = open("output.txt")
-matrice = np.array(json.load(f))
+# matrice2=passage_carte_couleur_carte_température(image_array)
+# 
+# with open('matrice2.txt','w') as f2:
+#     json.dump(matrice2.tolist(),f2)
+
+
+# matrice3=passage_carte_couleur_carte_température(image_array)
+# 
+# with open('matrice3.txt','w') as f3:
+#     json.dump(matrice3.tolist(),f3)
+
+# matrice4=passage_carte_couleur_carte_température(image_array)
+# 
+# with open('matrice4.txt','w') as f4:
+#     json.dump(matrice4.tolist(),f4)
+
+# matrice5=passage_carte_couleur_carte_température(image_array)
+# 
+# with open('matrice5.txt','w') as f5:
+#     json.dump(matrice5.tolist(),f5)
+
+# matrice6=passage_carte_couleur_carte_température(image_array)
+# 
+# with open('matrice6.txt','w') as f6:
+#     json.dump(matrice6.tolist(),f6)
+
+# matrice7=passage_carte_couleur_carte_température(image_array)
+# 
+# with open('matrice7.txt','w') as f7:
+#     json.dump(matrice7.tolist(),f7)
+
+
+
+f = open("matrice1.txt")
+matrice1 = np.array(json.load(f))
 
 #matrice[120]
 
@@ -540,6 +571,25 @@ class Carte: #l'objet que doit gérer Jb
             for j in range(largeurMondeCell):
                 c0 = self.cells[i][j]
                 c0.pression = P0*((c0.val + 273.15-constante*altitude)/(c0.val+273.15))**(masse_vol_soufre*g/(constante*R))
+                c0.val = 0
+                
+    def getMasseTropique (self):
+        angleTropique = radians(23+1/60*26)
+        
+        cellSud = self.cellFromLatLongRad(-angleTropique, 0)
+        cellNord = self.cellFromLatLongRad(angleTropique, 0)
+        
+        jsud = cellSud.ij[1]
+        jnord = cellNord.ij[1]
+        
+        rep = 0
+        
+        for i in range(longueurMondeCell):
+            for j in range(jsud, jnord+1):
+                rep += self.cells[i][j].m
+        return rep
+            
+        
 
     def draw(self):
 
@@ -557,29 +607,6 @@ class Carte: #l'objet que doit gérer Jb
                 
                 
 
-                
-#fonctions de controle, les mainLoop :
-
-def Update(carte0, carte_pression):
-    
-    matriceAccAir = passage_carte_pression_carte_acceleration_selon_x_et_y( carte_pression )
-    
-    carte0.updateCells(matriceAccAir)
-
-def Draw(carte0):
-    carte0.draw()
-    textDate.set(str(timeNOW))
-    label.pack()
-    root.update_idletasks()
-    root.update()
-
-def animate (carte0):
-    
-    Draw(carte0)
-    
-    Update(carte0, carte0.matrice_Pression_pour_Jb())
-    
-    time.sleep(1.0)
 
 print("Cells + Carte ok !")  
     
@@ -733,7 +760,34 @@ def transition_position_élémentaire(v_init,t_initial,i_sortie,j_sortie,m):
 # pas_elementaire=transition_position_élémentaire(2,4,100,2,4,10,[[1,2,10,15,12,30]],matrice_type)
 # [[1, 2, 10, 15, 12, 30], [1.0, 4, 31919600, 2, -4, 10]]
 
-print("import + logique poles ok !")   
+   
+
+
+                
+#fonctions de controle, les mainLoop :
+
+def Update(carte0, carte_pression):
+    
+    matriceAccAir = passage_carte_pression_carte_acceleration_selon_x_et_y( carte_pression )
+    
+    carte0.updateCells(matriceAccAir)
+
+def Draw(carte0):
+    carte0.draw()
+    textDate.set(str(timeNOW))
+    label.pack()
+    root.update_idletasks()
+    root.update()
+
+def animate (carte0):
+    
+    Draw(carte0)
+    
+    Update(carte0, carte0.matrice_Pression_pour_Jb())
+    
+    time.sleep(1.0)
+    
+print("import + logique poles ok !")
                                                                  
 #===========================================================================================================================================================================                                                          
 #====================================================================================================================================================================================================
@@ -747,18 +801,24 @@ print("on commence !!!!!!!!!!!")
 
 carte_init=Carte()
 importBigArray(carte_init,matrice)
-carte_init.cells[25][10].m += 1000
+carte_init.cells[75][30].m += 1000
+Draw(carte_init)
 
 for i in range(longueurMondeCell):
     ls = []
     for j in range(largeurMondeCell):
         ls.append(carte_init.cells[i][j].val)
     #print(ls)
+   
+indice_max=k
+indice=0   
                                                                  
-while True:
+while indice<=indice_max:
+    print(indice)
     animate(carte_init)
     print("t =", timeNOW)
+    print("qté soufre dans les tropiques = ", carte_init.getMasseTropique())
     timeNOW += dt
-                                                                 
+    indice+=1
                                                                  
 
