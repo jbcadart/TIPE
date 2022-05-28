@@ -107,7 +107,7 @@ k=100
 dt = t_total/k
 
 #constante calcul pression
-constante=3.9*10**(-3)  #Constante  calculé dans la démo de la fonction passage_temperature_sol_pression(M,Tsol) dans l'open office
+constante=4.7*10**(-3)  #Constante  calculé dans la démo de la fonction passage_temperature_sol_pression(M,Tsol) dans l'open office
 P0=100000
 altitude=9000   #La température ne varie pas entre 9 et 20 km (à peu près)
 g=9.81
