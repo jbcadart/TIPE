@@ -917,3 +917,6 @@ while indice<=indice_max:
     indice+=1
                                                                  
 
+def energie_reflechie(q_init,q_f,C_R):
+    percent=q_f/q_init*100
+    return((q_init*6.022*10**23*(0.382*10**(-9))**2*C_R)/(64*pi*(6360*10**3)**2))
